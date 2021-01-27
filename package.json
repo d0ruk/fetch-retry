@@ -19,7 +19,9 @@
   ],
   "author": "Jon K. Bernhardsen",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "lodash.merge": "^4.6.2"
+  },
   "devDependencies": {
     "body-parser": "^1.19.0",
     "chai": "^4.2.0",

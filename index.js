@@ -1,5 +1,7 @@
 'use strict';
 
+var merge = require("lodash.merge")
+
 module.exports = function (fetch, defaults) {
   defaults = defaults || {};
   if (typeof fetch !== 'function') {
@@ -61,14 +63,18 @@ module.exports = function (fetch, defaults) {
 
     // eslint-disable-next-line no-undef
     return new Promise(function (resolve, reject) {
-      var wrappedFetch = function (attempt) {
-        fetch(input, init)
+      var wrappedFetch = function (attempt, config) {
+        var options = merge({}, defaults, init, config);
+
+        fetch(input, options)
           .then(function (response) {
             if (Array.isArray(retryOn) && retryOn.indexOf(response.status) === -1) {
               resolve(response);
             } else if (typeof retryOn === 'function') {
-              if (retryOn(attempt, null, response)) {
-                retry(attempt, null, response);
+              var shouldRetry = retryOn(attempt, null, response);
+
+              if (shouldRetry) {
+                retry(attempt, null, response, shouldRetry);
               } else {
                 resolve(response);
               }
@@ -82,8 +88,10 @@ module.exports = function (fetch, defaults) {
           })
           .catch(function (error) {
             if (typeof retryOn === 'function') {
-              if (retryOn(attempt, error, null)) {
-                retry(attempt, error, null);
+              var shouldRetry = retryOn(attempt, null, response);
+
+              if (shouldRetry) {
+                retry(attempt, error, null, shouldRetry);
               } else {
                 reject(error);
               }
@@ -95,15 +103,15 @@ module.exports = function (fetch, defaults) {
           });
       };
 
-      function retry(attempt, error, response) {
+      function retry(attempt, error, response, config) {
         var delay = (typeof retryDelay === 'function') ?
           retryDelay(attempt, error, response) : retryDelay;
         setTimeout(function () {
-          wrappedFetch(++attempt);
+          wrappedFetch(++attempt, config);
         }, delay);
       }
 
-      wrappedFetch(0);
+      wrappedFetch(0, {});
     });
   };
 };
