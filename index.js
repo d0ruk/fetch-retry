@@ -67,11 +67,11 @@ module.exports = function (fetch, defaults) {
         var options = merge({}, defaults, init, config);
 
         fetch(input, options)
-          .then(function (response) {
+          .then(async function (response) {
             if (Array.isArray(retryOn) && retryOn.indexOf(response.status) === -1) {
               resolve(response);
             } else if (typeof retryOn === 'function') {
-              var shouldRetry = retryOn(attempt, null, response);
+              var shouldRetry = await retryOn(attempt, null, response);
 
               if (shouldRetry) {
                 retry(attempt, null, response, shouldRetry);
@@ -86,9 +86,9 @@ module.exports = function (fetch, defaults) {
               }
             }
           })
-          .catch(function (error) {
+          .catch(async function (error) {
             if (typeof retryOn === 'function') {
-              var shouldRetry = retryOn(attempt, null, response);
+              var shouldRetry = await retryOn(attempt, null, response);
 
               if (shouldRetry) {
                 retry(attempt, error, null, shouldRetry);
