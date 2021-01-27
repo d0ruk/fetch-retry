@@ -88,7 +88,7 @@ module.exports = function (fetch, defaults) {
           })
           .catch(async function (error) {
             if (typeof retryOn === 'function') {
-              var shouldRetry = await retryOn(attempt, null, response);
+              var shouldRetry = await retryOn(attempt, error, null);
 
               if (shouldRetry) {
                 retry(attempt, error, null, shouldRetry);
