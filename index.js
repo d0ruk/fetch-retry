@@ -1,6 +1,6 @@
 'use strict';
 
-var merge = require("lodash.merge")
+var merge = require('lodash.merge');
 
 module.exports = function (fetch, defaults) {
   defaults = defaults || {};
