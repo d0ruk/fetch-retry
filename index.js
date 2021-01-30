@@ -73,7 +73,7 @@ module.exports = function (fetch, defaults) {
             } else if (typeof retryOn === 'function') {
               var shouldRetry = await retryOn(attempt, null, response);
 
-              if (shouldRetry) {
+              if (shouldRetry && (attempt < retries)) {
                 retry(attempt, null, response, shouldRetry);
               } else {
                 resolve(response);
@@ -90,7 +90,7 @@ module.exports = function (fetch, defaults) {
             if (typeof retryOn === 'function') {
               var shouldRetry = await retryOn(attempt, error, null);
 
-              if (shouldRetry) {
+              if (shouldRetry && (attempt < retries)) {
                 retry(attempt, error, null, shouldRetry);
               } else {
                 reject(error);
